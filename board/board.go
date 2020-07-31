@@ -18,13 +18,16 @@ type Board interface {
 	CountByPlayer() (black, white int)
 	PossibilitiesByPlayer() (black, white int)
 	CanPlayerPlayAt(color int, position Coordinates) bool
+	IsStable(position Coordinates) bool
+	StableDisksByPlayer() (black, white int)
 	IsFinal() bool
 	PlayAt(color int, position Coordinates) (Board, error)
 }
 
 func (m *Matrix88) String() string {
-	s := ""
+	s := "  a b c d e f g h\n"
 	for x := 0 ; x < 8 ; x++ {
+		s += fmt.Sprintf("%d", x + 1)
 		for y := 0 ; y < 8 ; y++ {
 			switch m[x][y] {
 			case EMPTY:
@@ -37,7 +40,7 @@ func (m *Matrix88) String() string {
 		}
 		s += "\n"
 	}
-    // TODO show where players can play and number of possibilities by player
+	// TODO show where players can play and number of possibilities by player
 	black, white := m.CountByPlayer()
 	s += fmt.Sprintf("Black: %02d - White: %02d\n", black, white)
 	return s
@@ -77,6 +80,29 @@ func (m *Matrix88) CanPlayerPlayAt(color int, position Coordinates) bool {
 	}
 	// TODO short-circuit - find at least one
 	return true
+}
+
+func (m *Matrix88) IsStable(position Coordinates) bool {
+	if m[position.x][position.y] == EMPTY {
+		return false
+	}
+	// TODO
+	return true
+}
+
+func (m *Matrix88) StableDisksByPlayer() (black, white int) {
+	for x := 0 ; x < 8 ; x++ {
+		for y := 0 ; y < 8 ; y++ {
+			if m.IsStable(Coordinates{x, y}) {
+				if m[x][y] == BLACK {
+					black++
+				} else {
+					white++
+				}
+			}
+		}
+	}
+	return
 }
 
 func (m *Matrix88) IsFinal() bool {
